@@ -1,0 +1,760 @@
+---
+title: "Estat de l'art sobre la validació clínica de solucions digitals en l’ambit de la salut"
+subtitle: "Informe estadístic"
+author: "Jordi Real. Impuls digital"
+website: "https://github.com/jrealgatius/"
+
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    fig_caption: true
+    css: logos_css/usr_styles.css
+    
+params:
+  mostra: yes
+
+# bibliography: "references.bib"
+
+---
+
+&nbsp;
+<script>
+   $(document).ready(function() {
+     $head = $('#header');
+     <!-- $head.prepend('<img src=\"https://www.idiapjgol.org/images/logo.png\" style=\"float: right ;width: 130px;\"/>') -->
+     <!-- $head.prepend('<img src=\"https://avatars2.githubusercontent.com/u/57066591?s=200&v=4\" style=\"margin-left:25% ;width: 80px;\"/>') -->
+     <!-- $head.prepend('<img src=\"codi/logos_css/logo_sant_pau.png\" style=\"float: left:1;width: 185px;\"/>') -->
+     <!-- $head.prepend('<img src=\"codi/logos_css/logo_santpau.png\" style=\"float: left:1;width: 185px;\"/>') -->
+     $head.prepend('<img src=\"../codi/logos_css/logo_santpau.png\" style=\"float: left:1;width: 185px;\"/>')
+
+   });
+</script>
+
+
+<div class="watermark">DRAFT</div>
+
+****
+
+
+# Objectivos
+
+
+## Objetivo principal
+
+L'objectiu d'aquest manuscrit és revisar l'estat de l'art de la validació clínica de solucions digitals en el camp de la salut. S'exploraran els diferents mètodes utilitzats per avaluar l'eficàcia i seguretat clínica d'aquestes solucions, així com els desafiaments comuns que es troben en aquest procés. A més, s'identificaran les millors pràctiques en la validació clínica i es discutiran les perspectives futures per a un enfocament més eficaç en aquest àmbit en constant evolució.
+
+
+
+# Estatus
+
+### Fet 
+
+- Definició d'estrategia de cerca
+- Cerca bibliografica
+- Descarrega de papers resum
+- Captura de dissenys del Abstract
+- tipus de Journal
+- Descriptiva general
+- Proposta d'anàlisi bibliomètric
+
+### Pendent
+
+- Definir estrategia d'anàlisi principal
+
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE, include=T,size="huge")
+
+# Notació no cientifica dels numeros
+# options(scipen = 999)
+
+
+#######################################################
+#
+#
+# libreries i funcions necessaries
+library("dplyr")
+library("lubridate")
+library("compareGroups")
+library("ggplot2")
+library("wordcloud2")
+library("stringi")
+library("webshot")
+library("htmlwidgets")
+
+
+# 
+# path_conductor<-here::here("conductor_variables.xls")
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+
+```{r lectura_articles}
+
+
+dades<-read.csv2(here::here("dades","papers_2.txt"), sep="#") %>% mutate(PMID=as.character(PMID))
+
+dades_extra<-read.csv2(here::here("dades","objects_2.txt"), sep="#",encoding = "UTF-8")
+
+
+dt_cataleg_countries<-read.csv2(here::here("dades","Countries_2.txt"), sep=",",encoding = "UTF-8")
+
+# dades_extra2<-read.csv2(here::here("dades","objects_2.txt"), sep="#",encoding = "UTF-8")
+# 
+# dades_pais<-read.csv2(here::here("dades","papers_2.txt"), sep=",",encoding = "UTF-8") %>% select(PMID,COUNTRY)
+# 
+
+path_conductor<-here::here("conductor_state_of_art.xls")
+
+
+
+
+```
+
+
+```{r lectura_trials_WHO, eval=FALSE}
+
+
+dt_trials_WHO<-XML::xmlToDataFrame(here::here("dades/WHO","ICTRP-Results.xml"))
+
+
+
+
+```
+
+```{r lectura_clinicaltrials}
+
+#Termes ehealth
+dt_clinical_trials<-read.csv2(here::here("dades/clinicaltrials","ctg-studies.csv"), sep = ",")
+
+# Cerca termes ehealth OR.... Gontiveiros
+dt_clinical_trials<-read.csv2(here::here("dades/clinicaltrials","SearchResults.csv"), sep = ",")
+names(dt_clinical_trials)
+
+
+vars_analitzar<-c("Conditions","Gender","Age","Phases","Study.Type","Study.Designs","Status","Conditions","Interventions","Enrollment","Outcome.Measures")
+formu<-FormatGe::formula_vector(vars_analitzar,"")
+descrTable(formu,data=dt_clinical_trials)
+
+
+
+```
+
+
+```{r capturar_tipus}
+
+
+dt_temp<-readxl::read_excel(path_conductor,sheet = "journal_tipus") %>% select(TIPUS,Journal=agregador)
+
+dades_journals<-
+  dades_extra %>% filter(OBJECTE=="CUARTIL") %>% select(PMID,TIPUS,QUARTIL=VALOR) %>% left_join(dt_temp,by="TIPUS") %>% 
+  left_join(select(dades,PMID,PUBYEAR),by="PMID")
+
+
+
+```
+
+
+```{r pais_autor}
+
+# Capturar pais primer author
+dt_paisos<-
+  dades_extra %>% 
+  filter(OBJECTE=="AUTHOR") %>% select(PMID,VALOR) %>% 
+  mutate(pais=stringr::str_extract(VALOR, "(?<=,\\s)[^,]+$")) %>% 
+  mutate(pais=stringr::str_extract(pais,"^[^.]*")) %>% 
+  select(PMID,pais) %>% group_by(PMID) %>% slice(1) %>% ungroup() %>% 
+  mutate(pais=iconv(pais, from = "UTF-8", to = "UTF-8//IGNORE")) %>% 
+  mutate(pais=toupper(pais)) %>% 
+  mutate(pais=stringr::str_trim(pais))
+
+
+
+# Codis pais
+dt_codis_pais<-
+  dt_cataleg_countries %>% mutate(pais=toupper(Name)) %>% group_by(pais) %>% slice(1) %>% ungroup() %>% 
+  select(id_pais=Id,pais) %>% 
+   mutate(pais=stringr::str_trim(pais))
+
+# Fusionar paisos
+
+dt_paisos<-dt_paisos %>% left_join(dt_codis_pais, by="pais") %>% rename(Author_country=pais)
+
+
+# Posar en dades de papers 
+dades<-dades %>% left_join(dt_paisos, by="PMID")
+
+# Capturar regions 
+dt_regions<-read.csv(here::here("dades","countries_regions.csv"), sep = ",") %>% 
+  select(id_pais=alpha.2,region,subregion=sub.region) %>% 
+  na.omit() %>% filter(id_pais!="" | region!=" ")
+
+#
+dades<-
+  dt_regions %>% right_join(dades,by="id_pais") %>% 
+  relocate(names(dades))
+
+# Si Author_country==NA
+
+# dades %>% distinct(Author_country,id_pais,region,subregion)
+
+
+
+```
+
+
+
+
+
+# Resultats / Mètode 
+
+
+
+## Wordcloud Keywords
+
+```{r, include=FALSE}
+paraula<-"KEYWORD"
+
+freq_keyword<-
+  dades_extra %>% filter(OBJECTE==paraula) %>% 
+  mutate(VALOR=iconv(VALOR,to = "UTF-8", sub = "")) %>% 
+  mutate(VALOR=tolower(VALOR)) %>% 
+  group_by(VALOR) %>% count() %>% arrange(desc(n)) %>% filter(n>=2) %>% 
+  mutate(word=VALOR,freq=n) %>% ungroup() %>% select(word,freq)
+
+
+
+set.seed(123)
+world_cloud_keywords<-wordcloud2(freq_keyword,size = 2,shuffle =F)
+
+# wordcloud2(freq_keyword,size = 2,shuffle =F,color=rep_len( c("green","blue","orange","red"), nrow(freq_keyword)))
+
+
+saveWidget(world_cloud_keywords, "tmp.html", selfcontained = F)
+webshot("tmp.html", "wc1.png", delay = 5, vwidth = 1000, vheight = 1000)
+
+# {width=100%, height=100% }
+
+```
+
+![Wordcloud Keywords](wc1.png){width=400% height=400% }
+
+
+
+
+## Wordcloud termes Mesh
+
+```{r, include=TRUE, include=FALSE}
+
+paraula<-"MESH"
+
+freq_keyword<-
+  dades_extra %>% filter(OBJECTE==paraula) %>% group_by(VALOR) %>% count() %>% arrange(desc(n)) %>% filter(n>=2) %>% 
+  mutate(word=VALOR,freq=n) %>% ungroup() %>% select(word,freq)
+
+
+freq_keyword$word<-freq_keyword$word %>% iconv(to = "UTF-8", sub = "")
+
+
+set.seed(124)
+world_cloud_mesh<-wordcloud2(freq_keyword,size = 2)
+
+saveWidget(world_cloud_mesh, "tmp2.html", selfcontained = F)
+webshot("tmp2.html", "wc2.png", delay = 5, vwidth = 1000, vheight = 1000)
+
+
+# and in png or pdf
+# webshot("tmp.html","fig_1.pdf", delay =5, vwidth = 480, vheight=480)
+
+
+```
+
+
+![wordcloud Mesh terms](wc2.png){width=400% height=400% }
+
+## Termes relatius dissenys / Usabilitat
+
+- Fer taula de frequencies vinculada a la taula disseny
+
+```{r}
+
+# Open dt_termes_dissenys
+dt_termes_dissenys<-readxl::read_excel(path_conductor,sheet = "termes") %>% filter(terme!=is.na(terme))
+
+# En faig una llista 
+llistat_dissenys<-split(dt_termes_dissenys$terme, dt_termes_dissenys$disseny)
+vector_dissenys<-names(llistat_dissenys)
+
+
+dt_termes_dissenys %>% filter(classe=="design") %>% select(terme, disseny, tipo) %>% 
+  kableExtra::kable(caption = "Termes buscats a l'Abstract relatius a disseny") %>% kableExtra::kable_classic_2()
+
+#
+dt_termes_dissenys %>% filter(classe=="dimension") %>% select(terme, dimensio=disseny) %>% 
+  kableExtra::kable(caption = "Termes buscats a l'Abstract relatius a Usabilitat-Satisfacció") %>% 
+  kableExtra::kable_classic_2()
+
+
+
+
+```
+
+
+
+
+
+```{r}
+
+# Captura dissenys/ dimensions
+
+dt_temp<-dades_extra %>% filter(OBJECTE=="ABSTRACT") %>% select(PMID,text=VALOR)
+
+# Generar variables dummies para cada palabra en el tibble
+for (i in 1:length(llistat_dissenys)) {
+  generar_dummy <- function(texto, patron) {any(stri_detect_fixed(texto, patron, case_insensitive = TRUE))}
+  patro<-llistat_dissenys[[i]]
+  
+  dt_temp <- dt_temp %>% rowwise() %>% 
+    mutate(!!names(llistat_dissenys[i]) := as.numeric(generar_dummy(text,patro)))}
+
+
+## Agregar per PMID
+dt_temp<-dt_temp %>% select(-text) %>%
+  group_by(PMID) %>% 
+    summarise_all(sum) %>% 
+  ungroup() %>% 
+  mutate_at(vector_dissenys, ~if_else(.>0,1,0))
+
+## Disseny
+dt_temp<-dt_temp %>% mutate(Design = rowSums(.[vector_dissenys])) %>% 
+  mutate(Design=if_else(Design>0,1,0)) %>% relocate(PMID,Design)
+
+
+dades<-dades %>% left_join(dt_temp,by="PMID")
+
+
+
+```
+
+
+
+```{r, eval=FALSE}
+
+# Open dt_termes_dissenys
+dt_termes_usability<-readxl::read_excel(path_conductor,sheet = "terms_usability") 
+
+# En faig una llista 
+llistat_usability<-split(dt_termes_usability$terme, dt_termes_usability$tipus)
+vector_usability<-names(llistat_usability)
+
+
+dt_termes_usability %>% kableExtra::kable() %>% kableExtra::kable_classic_2()
+
+
+
+```
+
+
+
+
+```{r}
+## Generar Dissenys excloents
+
+dt_temp<-dades %>% mutate(Design_tipo=case_when(RCT==1      ~"RCT",
+                                    Cohort==1   ~ "Cohort",
+                                    `Case-control` == 1 ~ "Case-control",
+                                    `Cross-sectional` == 1 ~ "Cross-sectional",
+                                    `Systematic review`== 1 ~ "Systematic review"
+                                    ))
+
+
+# Observational / experimental
+observational_terms<-dt_termes_dissenys %>% filter(tipo=="Observational") %>% pull(disseny)
+experimental_terms<-dt_termes_dissenys %>% filter(tipo=="Experimental") %>% pull(disseny)
+
+
+dt_temp<-dt_temp %>% 
+  mutate(study_type= case_when(Design_tipo %in% observational_terms ~ "Observational",
+                               Design_tipo %in% experimental_terms ~ "Experimental", 
+                               TRUE ~ NA_character_
+                               ))
+
+dt_temp<-
+  dt_temp %>% 
+  mutate(study_type=if_else(is.na(study_type) & Experimental==1, "Experimental",study_type)) %>% 
+  mutate(study_type=if_else(is.na(study_type) & Observational==1, "Observational",study_type))
+
+
+dades<-dt_temp
+
+```
+
+
+
+```{r}
+# Arreglar noms de variables
+
+
+dades<-FormatGe::netejar.noms.variables(dades)
+
+
+```
+
+```{r}
+
+# Yes No 
+vars_SINO<-FormatGe::extreure.variables("SiNo",path_conductor)
+dades<-dades %>% mutate_at(vars_SINO,~if_else(.==1,"Yes","No"))
+
+
+```
+
+
+```{r}
+
+dades<-dades %>% FormatGe::etiquetar(path_conductor)
+
+
+```
+
+## Descriptiva I
+
+- `r paste0("Global; n=", length(dades[,1]))`
+
+
+
+```{r}
+
+
+# Problemes amb els noms dels camps per fer descriptiva
+
+formu<-FormatGe::formula_text("Baseline","",taulavariables = path_conductor)
+
+descrTable( formu , method = 3, hide = "No", data=dades) %>% export2md()
+
+
+
+# Problemes amb els noms dels camps per fer descriptiva
+
+formu<-FormatGe::formula_text("disenys","",taulavariables = path_conductor)
+
+descrTable( formu , method = 3, hide = "No", data=dades, show.n = F) %>% export2md()
+
+
+formu<-FormatGe::formula_text("dimensio","",taulavariables = path_conductor)
+
+descrTable( formu , method = 3, hide = "No", data=dades, show.n = F) %>% export2md()
+
+
+
+```
+
+
+## Flow-chart 
+
+```{r, eval=TRUE}
+# abstract_sense_disseny<-dt_pp %>% filter(disseny==0) 
+# abstract_amb_disseny<-dt_pp %>% filter(disseny==1) 
+
+ggflowchart::Flow_chart_Consort(dt_temp, exclusions = c("Design=='0'"))
+
+dt_temp<-dades %>% filter(Design=="Yes")
+
+```
+
+## Descriptiva II
+
+- `r paste0("n=", length(dades[,1]) )`
+
+```{r, eval=TRUE}
+
+
+descrTable(formu, data=dt_temp, hide = "No", include.miss = T) %>% export2md()
+
+
+
+
+```
+
+
+```{r}
+
+# dt_temp<-dades_extra %>% filter(OBJECTE=="ABSTRACT") %>% select(PMID,text=VALOR) %>% head()
+
+
+```
+
+## Descriptiva de Journal per àmbit
+
+```{r}
+
+# Agafo els 10/15 més frequents
+Journal_tipo_freq<-dades_journals %>% group_by(Journal) %>% count() %>% arrange(desc(n)) %>% ungroup() %>% mutate(id=1:n()) %>% filter(id<20) %>% pull(Journal)
+
+# Colapsar las categorías poco frecuentes (C y D) en una sola categoría "Otros"
+dt_temp<-dades_journals %>% mutate(Journal=if_else(Journal%in%Journal_tipo_freq, Journal,"Others"))
+
+
+# Reordenamos las categorías por frecuencia
+dt_temp$Journal <- factor(dt_temp$Journal,levels = names(sort(table(dt_temp$Journal),
+                                                     decreasing = TRUE)))
+
+
+# # Fer taula
+# dt_temp %>% group_by(Journal) %>% count() %>% arrange(desc(n))
+
+#
+table1::table1(~Journal,data=dt_temp, footnote="Others: frequency < 1%") 
+
+
+
+
+```
+
+### Figura
+
+```{r}
+# Figura de frequencies
+
+# Colapsar las categorías poco frecuentes (C y D) en una sola categoría "Otros"
+dt_temp<-dades_journals %>% mutate(Journal=if_else(Journal%in%Journal_tipo_freq, Journal,"Others"))
+
+# Journal a minuscula
+dt_temp<-
+  dt_temp %>% mutate(Journal=tolower(Journal)) %>% 
+  mutate(Journal= paste(toupper(substr(Journal, 1, 1)), substr(Journal, 2, nchar(Journal)), sep = ""))
+  
+
+dt_temp2<-dt_temp %>% group_by(Journal) %>% count() 
+
+source("funcions_plots.R")
+
+generar_plot_estimacions_profile()
+
+
+```
+
+
+## Evolució de frequencia de papers
+
+- Segons Quartil
+- Segons ámbit de revista
+
+```{r}
+# VAriable tipus 
+# Agafo els 10/15 més frequents
+Journal_tipo_freq<-dades_journals %>% group_by(Journal) %>% count() %>% arrange(desc(n)) %>% ungroup() %>% mutate(id=1:n()) %>% filter(id<10) %>% pull(Journal)
+
+# Colapsar las categorías poco frecuentes (C y D) en una sola categoría "Otros"
+dt_temp<-dades_journals %>% mutate(Journal=if_else(Journal%in%Journal_tipo_freq, Journal,"Others"))
+
+
+dt_temp<-dt_temp %>% select(PMID,TIPUS, Quartil=QUARTIL,PUBYEAR,Journal)
+
+# Agregació per any x quartil
+
+dt_temp3<-dt_temp %>% group_by(PUBYEAR) %>% count() %>% na.omit() %>% ungroup() %>% mutate(Quartil="Overall") %>% filter(Quartil!="N/A") 
+
+dt_temp2<-dt_temp %>% group_by(PUBYEAR,Quartil) %>% count() %>% na.omit() %>% ungroup() %>% filter(Quartil!="N/A") 
+
+dt_temp2<-dt_temp2 %>% bind_rows(dt_temp3) %>% arrange(PUBYEAR,Quartil) %>% 
+  filter(PUBYEAR<2023 & PUBYEAR>2005)
+
+
+# dt_temp2
+
+# Gg-plot 
+ggplot(dt_temp2, aes(x = PUBYEAR, y = n, group = Quartil, color = Quartil)) +
+  # geom_line(size=1) +
+  geom_smooth(method = "loess", se = FALSE) +
+  labs(title = "Evolution of the papers indexed in PubMed by Quartile",
+       x = "Year of publication",
+       y = "Frequency",
+       color = "Quartile") + ggplot2::theme_light() +
+  
+   scale_x_continuous(breaks = seq(min(dt_temp2$PUBYEAR), max(dt_temp2$PUBYEAR), by=2)) +
+  
+   theme(legend.position = "top",
+        legend.text = element_text(size = 7)) 
+
+  
+ 
+
+```
+
+
+```{r}
+
+# Por terminos / ambitos
+
+# VAriable tipus 
+# Agafo els 10/15 més frequents
+Journal_tipo_freq<-dades_journals %>% group_by(Journal) %>% count() %>% arrange(desc(n)) %>% ungroup() %>% 
+  mutate(id=1:n()) %>% filter(id<5) %>% pull(Journal)
+
+# Colapsar las categorías poco frecuentes (C y D) en una sola categoría "Otros"
+dt_temp<-dades_journals %>% mutate(Journal=if_else(Journal%in%Journal_tipo_freq, Journal,"Others")) %>% filter(Journal!="Others")
+
+
+dt_temp<-dt_temp %>% select(PMID,TIPUS, Quartil=QUARTIL,PUBYEAR,Journal)
+
+
+# Agregació per any
+dt_temp2<-dt_temp %>% group_by(PUBYEAR,Journal) %>% count() %>% na.omit() %>% ungroup() %>% filter(Journal!="N/A") %>% 
+  filter(PUBYEAR<2023 & PUBYEAR>2005)
+
+# Gg-plot 
+ggplot(dt_temp2, aes(x = PUBYEAR, y = n, group = Journal, color = Journal)) +
+  # geom_line(size=1) +
+  geom_smooth(method = "loess", se = FALSE) +
+  labs(title = "Evolution of the frequency papers indexed in PubMed by scope",
+       x = "Year of publication",
+       y = "Frequency",
+       color = "") +
+  
+  scale_x_continuous(breaks = seq(min(dt_temp2$PUBYEAR), max(dt_temp2$PUBYEAR), by=2)) +
+  
+  ggplot2::theme_light() +
+  theme(legend.position = "top",
+        legend.text = element_text(size = 6)) 
+  
+
+
+
+
+```
+
+## Papers per paisos i regions
+
+```{r papers_regions, eval=F}
+
+pp<-dades %>% group_by(Author_country) %>% count() %>% arrange(desc(n))
+
+
+tt<-dades %>% select(id_pais,Author_country,subregion) %>% distinct()
+
+dades %>% group_by()
+
+library("table1")
+
+
+table1::table1(~ region+ subregion + Author_country, data=dades)
+
+
+dades$region
+
+dades$subregion
+
+
+table1::table1(~ subregion | region, data=dades)
+
+table1::table1(~ Author_country | subregion, data=dades)
+
+```
+
+
+```{r generar_dades_mapa}
+library(maps)
+library(countrycode)
+
+# Cargar el mapa mundial
+mapa_mon <- map_data("world")
+
+# Capturar codi iso2c 
+tabla_codigos <- countrycode(
+  sourcevar = unique(mapa_mon$region), 
+  origin = c("country.name.en"), 
+  destination = "iso2c")
+
+pp<-tibble(region=unique(mapa_mon$region),id_pais=tabla_codigos)
+mapa_mon<-mapa_mon %>% left_join(pp,by="region")
+
+# Falta afegir subregio
+# Capturar regions 
+dt_regions<-read.csv(here::here("dades","countries_regions.csv"), sep = ",") %>% 
+  select(id_pais=alpha.2,region1=region,subregion=sub.region)
+
+mapa_mon<-mapa_mon %>% select(-subregion) %>% left_join(dt_regions,by=c("id_pais"))
+
+# Capturar frequencies d'articles
+```
+
+
+```{r mapa_subregions, eval=TRUE}
+
+# Agregació per subregions
+freqs_subregions<-dades %>% group_by(subregion) %>% count() %>% ungroup()
+
+
+datos_mapa<-mapa_mon %>% 
+  # filter(is.na(subregion)) %>% 
+  left_join(freqs_subregions) %>% rename(frecuencia=n)
+
+# Crear el plot de mapa de frecuencias
+ggplot(datos_mapa, aes(x = long, y = lat, group = group, fill = frecuencia)) +
+  geom_polygon() +
+  coord_fixed(ratio = 1.6) + # Relación de aspecto para proyectar el mapa correctamente
+  scale_fill_gradient(low = "grey", high = "blue") +
+  labs(title = "Frequency Map of Papers by regions",
+       fill = "Frecuencia",
+       x = "", y = "") +
+  theme_minimal()
+
+
+```
+
+
+```{r, eval=FALSE}
+
+dades %>% group_by(id_pais) %>% count() %>% ungroup() %>% arrange(desc(n))
+dades %>% group_by(Author_country) %>% count() %>% ungroup() %>% arrange(desc(n))
+
+
+```
+
+
+```{r mapa_per_pais}
+
+# Mapa per pais
+
+# Capturar frequencies d'articles
+# Agregació per subregions
+freqs_pais<-dades %>% group_by(id_pais) %>% count() %>% ungroup()
+datos_mapa<-mapa_mon %>% left_join(freqs_pais) %>% rename(frecuencia=n)
+
+# Crear el plot de mapa de frecuencias
+ggplot(datos_mapa, aes(x = long, y = lat, group = group, fill = frecuencia)) +
+  geom_polygon() +
+  coord_fixed(ratio = 1.6) + # Relación de aspecto para proyectar el mapa correctamente
+  scale_fill_gradient(low = "grey", high = "blue") +
+  labs(title = "Frequency Map of Papers by Countries Worldwide",
+       fill = "Frequency",
+       x = "", y = "") +
+  theme_minimal()
+
+
+
+
+```
+
+
+```
+&nbsp;
+<hr />
+<p style="text-align: center;">A work by $Jordi Real$ </a></p>
+<p style="text-align: center;">$Ll-li System$ </a></p>
+<p style="text-align: center;"><span style="color: #808080;"><em><https://github.com/USR-DAPCAT/></em></span></p>
+
+

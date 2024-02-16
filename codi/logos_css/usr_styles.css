@@ -1,0 +1,40 @@
+body {
+  font-family: Barlow, helvetica, sans-serif;
+}
+
+
+h1 {
+  color: rgb(239, 118, 34);
+  font-size: 127%;
+  font-weight: bold;
+}
+
+.title {
+  margin-right: 200px;
+}
+
+h2 {
+  color: rgb(112, 111, 111);
+  font-size: 121%;
+  font-weight: bold;
+}
+
+h3 {
+  font-size: 109%;
+  font-weight: bold;
+}
+
+h4 {
+  font-size: 100%;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.watermark {
+  opacity: 0.2;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  font-size: 500%;
+  color: #00407d;
+}
