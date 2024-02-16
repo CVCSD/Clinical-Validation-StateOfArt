@@ -51,3 +51,14 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# dins de carpeta codi
+codi/temp1.*
+codi/temp2.*
+codi/temp3.*
+codi/tmp2.*
+codi/*.png
+codi/*.html
+
+
+
