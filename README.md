@@ -1,6 +1,6 @@
 # Bibliometric Data Analysis Scripts 
 
-## instructions for running data analysis
+## Instructions for running data analysis
 
 - Clone this repository in the Rstudio environment.
 - Required R packages for installation:  (refer to the list below).
