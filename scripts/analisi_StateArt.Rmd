@@ -124,21 +124,21 @@ library("officer")
 ```{r lectura_articles_pubmed}
 
 
-dades<-read.csv2(here::here("dades","papers.txt"), sep="#") %>% mutate(PMID=as.character(PMID))
+dades<-read.csv2(here::here("data","papers.txt"), sep="#") %>% mutate(PMID=as.character(PMID))
 
-dades_extra<-read.csv2(here::here("dades","objects.txt"), sep="#",encoding = "UTF-8")
+dades_extra<-read.csv2(here::here("data","objects.txt"), sep="#",encoding = "UTF-8")
 
 
-dt_cataleg_countries<-read.csv2(here::here("dades","Countries.txt"), sep=",",encoding = "UTF-8")
+dt_cataleg_countries<-read.csv2(here::here("data","Countries.txt"), sep=",",encoding = "UTF-8")
 
-# dades_extra2<-read.csv2(here::here("dades","objects_2.txt"), sep="#",encoding = "UTF-8")
+# dades_extra2<-read.csv2(here::here("data","objects_2.txt"), sep="#",encoding = "UTF-8")
 # 
-# dades_pais<-read.csv2(here::here("dades","papers_2.txt"), sep=",",encoding = "UTF-8") %>% select(PMID,COUNTRY)
+# dades_pais<-read.csv2(here::here("data","papers_2.txt"), sep=",",encoding = "UTF-8") %>% select(PMID,COUNTRY)
 # 
 
 path_conductor<-here::here("conductor_state_of_art.xls")
 
-path_docs<-here::here("resultats","taules.docx")
+path_docs<-here::here("outputs","taules.docx")
 
 
 ```
@@ -157,10 +157,10 @@ dt_trials_WHO<-XML::xmlToDataFrame(here::here("dades/WHO","ICTRP-Results.xml"))
 ```{r lectura_clinicaltrials, include=FALSE}
 
 #Termes ehealth
-dt_clinical_trials<-read.csv2(here::here("dades/clinicaltrials","ctg-studies.csv"), sep = ",")
+dt_clinical_trials<-read.csv2(here::here("data/clinicaltrials","ctg-studies.csv"), sep = ",")
 
 # Cerca termes ehealth OR.... Gontiveiros
-dt_clinical_trials<-read.csv2(here::here("dades/clinicaltrials","SearchResults.csv"), sep = ",")
+dt_clinical_trials<-read.csv2(here::here("data/clinicaltrials","SearchResults.csv"), sep = ",")
 names(dt_clinical_trials)
 
 
@@ -216,7 +216,7 @@ dt_paisos<-dt_paisos %>% left_join(dt_codis_pais, by="pais") %>% rename(Author_c
 dades<-dades %>% left_join(dt_paisos, by="PMID")
 
 # Capturar regions 
-dt_regions<-read.csv(here::here("dades","countries_regions.csv"), sep = ",") %>% 
+dt_regions<-read.csv(here::here("data","countries_regions.csv"), sep = ",") %>% 
   select(id_pais=alpha.2,region,subregion=sub.region) %>% 
   na.omit() %>% filter(id_pais!="" | region!=" ")
 
@@ -999,7 +999,7 @@ mapa_mon<-mapa_mon %>% left_join(pp,by="region")
 
 # Falta afegir subregio
 # Capturar regions 
-dt_regions<-read.csv(here::here("dades","countries_regions.csv"), sep = ",") %>% 
+dt_regions<-read.csv(here::here("data","countries_regions.csv"), sep = ",") %>% 
   select(id_pais=alpha.2,region1=region,subregion=sub.region)
 
 dt_regions<-dt_regions %>% filter(!is.na(id_pais))
@@ -1100,16 +1100,16 @@ officer::read_docx(path_docs) %>%
 ```{r salvar_figures}
 
 
-ggsave(here::here("resultats","fig2B.png"), fig3)
+ggsave(here::here("outputs","fig2B.png"), fig3)
 
-ggsave(here::here("resultats","fig2A.png"), fig4)
+ggsave(here::here("outputs","fig2A.png"), fig4)
 
-ggsave(here::here("resultats","fig3A.png"),gg_map2)
+ggsave(here::here("outputs","fig3A.png"),gg_map2)
 
-ggsave(here::here("resultats","fig3A_regions.png"),gg_map1)
+ggsave(here::here("outputs","fig3A_regions.png"),gg_map1)
 
 htmlwidgets::saveWidget(world_cloud_keywords, "wordcloud.html", selfcontained = F)
-webshot::webshot("wordcloud.html", file=here::here("resultats","wordcloud.png"), delay = 5, vwidth = 1000, vheight = 1000)
+webshot::webshot("wordcloud.html", file=here::here("outputs","wordcloud.png"), delay = 5, vwidth = 1000, vheight = 1000)
 
 
 ```
