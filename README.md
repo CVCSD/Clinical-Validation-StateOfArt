@@ -2,9 +2,8 @@
 
 ## Instructions for Running Data Analysis
 
-1. Clone this repository in the Rstudio environment.
-2. Install the requeried R packages listed below:
-   - R-base (>4.2)
+1. Clone this repository in the Rstudio.
+2. Install the requeried R packages (R version >4.2):
    - `rmarkdown`
    - `dplyr`
    - `lubridate`
