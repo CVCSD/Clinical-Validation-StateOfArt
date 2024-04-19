@@ -1,6 +1,5 @@
 ---
-title: Estat de l'art sobre la validació clínica de solucions digitals en l’àmbit
-  de la salut
+title: Clinical Validation of Digital Healthcare Solutions State of the Art, Challenges and Opportunities
 author: "Jordi Real. Impuls digital"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
@@ -10,10 +9,8 @@ output:
     fig_caption: yes
     css: logos_css/usr_styles.css
 
-subtitle: Informe estadístic
+subtitle: Bibliometric and visual analysis. Statistical report
 website: https://github.com/jrealgatius/
-params:
-  mostra: yes
 bibliography: references.bib
 ---
 
@@ -36,36 +33,32 @@ bibliography: references.bib
 ****
 
 
-# Objectivos
+# Objective
 
 
-## Objetivo principal
-
-L'objectiu d'aquest manuscrit és revisar l'estat de l'art de la validació clínica de solucions digitals en el camp de la salut. S'exploraran els diferents mètodes utilitzats per avaluar l'eficàcia i seguretat clínica d'aquestes solucions, així com els desafiaments comuns que es troben en aquest procés. A més, s'identificaran les millors pràctiques en la validació clínica i es discutiran les perspectives futures per a un enfocament més eficaç en aquest àmbit en constant evolució.
+To review the state of the art of clinical validation of digital solutions in the field of healthcare. The different methods used to assess the clinical effectiveness and safety of these solutions will be explored, as well as the common challenges encountered in this process. Additionally, best practices in clinical validation will be identified, and future perspectives for a more effective approach in this constantly evolving field will be discussed.
 
 
 
-# Estatus
+# Status
 
-### Fet 
+### Done 
 
-- Definició d'estrategia de cerca
-- Cerca bibliografica
-- Descarrega de papers resum
-- Captura de dissenys del Abstract
-- tipus de Journal
-- Descriptiva general
-- Proposta d'anàlisi bibliomètric
+- Definition of search strategy
+- Literature search
+- Download of abstracts
+- Capture of abstract designs
+- Journal types
+- General description
+- Bibliometric analysis (Visual and descriptive)
 
-### Pendent
 
-- Definir estrategia d'anàlisi principal
+# Method
 
-# Mètode
+Based on the articles found in the initial search (without filtering by publication year; n=1250 papers), a bibliometric study was conducted. A dataset was created compiling information for each article: publication year, journal, country of the journal, abstract, keywords, impact factor, quartiles, and categories. A descriptive analysis of the frequencies of the generated variables, graphical analysis, Wordcloud of keywords and Mesh terms, and an analysis of frequencies according to the region and country of the first author of the article were performed. Variables related to the type of design used and domains were generated through searches of words in the title, abstract, and keywords. The list of synonymous words used according to design and domain can be seen in Tables and Annex. Additionally, the scope of application and the journal quartile were captured.
 
-A partir dels articles trobats en la cerca inicial (sense filtrar per any de publicació; n=1250 papers) es va realitzar un estudi bibliomètric. Es va crear un dataset recopilant informació relativa a cada article: any de publicació, revista, país de la revista, abstract, keywords, factor d'impacte, quartils i categoríes. Es va realitzar un anàlisi descriptiva de freqüències de les variables generades, anàlisi gràfic, Wordcloud de keywords y termes mesh, i una analisis de frequencies segons la regió i país del primer autor de l’article. Les variables relatives al tipus de disseny utilitzades i dominis es van generar mitjançant cerques de paraules en el títol, resum, i keywords. La relació de paraules sinonimes utilitzades segons disseny i domini es poden veure en les taules X de l’annex X. A més a més es va capturar l’àmbit d’aplicació i el quartil de la revista. 
-Es va realitzar una taula descriptiva bivariada dels termes relatius al domini en relació al disseny de l'estudi (Observacional / Experimental). 
-La gestió i anàlisi de dades es va realitzar mitjançant @R-base, les taules bivariades es van generar mitjançant el paquet @R-compareGroups, @compareGroups2014 i l'analisis gràfic es va realitzar mitjançant els paquets de R @R-ggplot2, @R-wordcloud2 i @R-maps. 
+A bivariate descriptive table of terms related to the domain in relation to the study design (Observational / Experimental) was performed. Data management and analysis were performed using @R-base, bivariate tables were generated using the package @R-compareGroups, @compareGroups2014, and graphical analysis was performed using R packages @R-ggplot2, @R-wordcloud2, and @R-maps.
+
 
 
 
@@ -113,6 +106,7 @@ library("webshot")
 library("htmlwidgets")
 library("bibtex")
 library("officer")
+library("flextable")
 
 # 
 # path_conductor<-here::here("conductor_variables.xls")
@@ -144,33 +138,6 @@ path_docs<-here::here("outputs","taules.docx")
 ```
 
 
-```{r lectura_trials_WHO, eval=FALSE}
-
-
-dt_trials_WHO<-XML::xmlToDataFrame(here::here("dades/WHO","ICTRP-Results.xml"))
-
-
-
-
-```
-
-```{r lectura_clinicaltrials, include=FALSE}
-
-#Termes ehealth
-dt_clinical_trials<-read.csv2(here::here("data/clinicaltrials","ctg-studies.csv"), sep = ",")
-
-# Cerca termes ehealth OR.... Gontiveiros
-dt_clinical_trials<-read.csv2(here::here("data/clinicaltrials","SearchResults.csv"), sep = ",")
-names(dt_clinical_trials)
-
-
-vars_analitzar<-c("Conditions","Gender","Age","Phases","Study.Type","Study.Designs","Status","Conditions","Interventions","Enrollment","Outcome.Measures")
-formu<-FormatGe::formula_vector(vars_analitzar,"")
-descrTable(formu,data=dt_clinical_trials)
-
-
-
-```
 
 
 ```{r capturar_tipus}
@@ -233,9 +200,9 @@ dades<-
 ```
 
 
-## Termes relatius dissenys / Usabilitat
+## Terms related to designs / Usability
 
-- Llistat de termes / sinonims buscats per dominis/dissenys
+- List of terms / synonyms searched for domains/designs
 
 ```{r llistat_termes}
 
@@ -254,7 +221,7 @@ taula1<-
   select(disseny,terme) 
   
 taula1 %>% 
-  kableExtra::kable(caption = "Tabla S1. Llistat de termes en Abstract keywords titul relatius a dissenys") %>% kableExtra::kable_classic_2()
+  kableExtra::kable(caption = "Table S1. List of terms in Abstract keywords titles related to designs") %>% kableExtra::kable_classic_2()
 
 #
 taula2<-dt_termes_dissenys %>% filter(classe=="dimension") %>% select(terme, dimensio=disseny) %>% distinct() %>% 
@@ -262,7 +229,7 @@ taula2<-dt_termes_dissenys %>% filter(classe=="dimension") %>% select(terme, dim
 
 #
 taula2 %>% 
-  kableExtra::kable(caption = "Tabla S2. Llistat de termes en Abstract/Keywords/Titol segons Dimensió o ámbit d'aplicació") %>% 
+  kableExtra::kable(caption = "Table S2. List of terms in Abstract/Keywords/Title according to Dimension or Scope of Application") %>% 
   kableExtra::kable_classic_2()
 
 
@@ -271,7 +238,7 @@ taula2 %>%
 
 ```{r test_officer, eval=TRUE}
 
-library(flextable)
+
 
 # tt<-dt_termes_dissenys %>% filter(classe=="dimension") %>% select(terme, dimensio=disseny) %>% distinct() %>% 
 #   group_by(dimensio) %>% mutate(id=1:n()) %>% mutate(dimensio=if_else(id==1,dimensio,"")) %>% select(dimensio,terme) %>% 
@@ -281,7 +248,7 @@ library(flextable)
 tt<-taula1 %>% 
   flextable::flextable() %>% 
   flextable::theme_zebra() %>% 
-  flextable::set_caption("Tabla S1. Llistat de termes en Abstract/Keywords/Titol segons Dimensió o ámbit d'aplicació") %>% 
+  flextable::set_caption("Table S1. List of terms in Abstract/Keywords/Title according to Dimension or Scope of Application") %>% 
   flextable::autofit()
 
 # Export to word taula1
@@ -294,7 +261,7 @@ officer::read_docx() %>%                        # creating a null .docx object
 tt<-taula2 %>% 
   flextable() %>% 
   flextable::theme_zebra() %>% 
-  set_caption("Tabla S2. Llistat de termes en Abstract/Keywords/Titol segons Dimensió o ámbit d'aplicació") %>% 
+  set_caption("Table S2. List of terms in Abstract/Keywords/Title according to Dimension or Scope of Application") %>% 
   autofit()
   
 # Export to word taula1
@@ -315,25 +282,24 @@ officer::read_docx(path_docs) %>%                 # creating a null .docx object
 
 ```
 
-# Resultats
-
-## Resultats comentats
-
-La cerca va proporcionar un total de 1250 papers. En el Wordcloud es pot apreciar que les keywords més frequents fan referencia a mobile health , ehealth i validation. Del total dels 1250 papers es van identificar els dissenys epidemiologics de 449 d'ells, dels quals el 40% es van classificar com a clinical Trials, mentre la resta eren estudis observacionals o systematic reviews. Dels treballs que es va identificar el diseny epidemiologic, el 55.3% eren observacionals. 
-
-De totes les referencies trobades, la dimensió mes frequent va ser la de Usability (n=222 17.8%), seguida de segurity (14.2%), i la de feasibility (10.0%). 
-
-La taula X (Bivariada) / Figura, mostra la frequencia de papers trobats per dimensions en funció de si els treballs s'ha pogut classificar com observacionals o experimentals. S'observen diferencies significatives (p<0.05) en les dimensions de Feasibility (Prova de concepte), i Effectiveness, amb major representació els treballs experimentals en comparació amb els estudis observacionals. La resta de dimensions mostren frequencies similars, excepte la dimensió de Efficacy on també s'observa més representació en els Experimentals (10.6% versus 5.8%) 
+# Results
 
 
-Pel que fa a l'ámbit o scope s'aplicació on es publiquen, un 21.5% dels articles es van trobar en Health care sciences, i un 19% en revistes relatives a medical informatics.  La frequencia de papers ha aumentat de de manera exponencial sent sempre més frequent en revistes classificades en quartils 1 o 2.
 
-Els autors que més publiquen son principalment del Estats units (25%), seguits de paisos europeus , com UK (7.53%), espanya, Germany i australia (7.53%).
+The search provided a total of 1250 papers. In the Wordcloud, it can be observed that the most frequent keywords refer to mobile health, eHealth, and validation. Out of the total 1250 papers, epidemiological designs were identified in 449 of them, of which 40% were classified as clinical trials, while the rest were observational studies or systematic reviews. Among the works where the epidemiological design was identified, 55.3% were observational.
+
+Of all the references found, the most frequent dimension was Usability (n=222, 17.8%), followed by Security (14.2%), and Feasibility (10.0%).
+
+Table and figure shows the frequency of papers found per dimensions depending on whether the studies could be classified as observational or experimental. Significant differences (p<0.05) are observed in the dimensions of Feasibility (Proof of concept), and Effectiveness, with greater representation in experimental studies compared to observational studies. The rest of the dimensions show similar frequencies, except for the dimension of Efficacy, where there is also more representation in experimental studies (10.6% versus 5.8%).
+
+Regarding the scope of application where they are published, 21.5% of the articles were found in Health care sciences, and 19% in journals related to medical informatics. The frequency of papers has exponentially increased, being more frequent in journals classified in quartiles 1 or 2.
+
+The authors who publish the most are mainly from the United States (25%), followed by European countries such as the UK (7.53%), Spain, Germany, and Australia (7.53%).
 
 
-## Limitacions sobre la interpretació
+## Limitations on Interpretation
 
-L'estudi bibliomètric es basa en la cerca de paraules de manera automàtica, fet que comporta certes limitacions intrínseques que cal tenir en compte en la interpretació. Això inclou la manca de context, l'evolució del llenguatge, els sinònims i les variacions lingüístiques que poden fer servir diferents paraules o frases per descriure conceptes semblants, la qual cosa pot conduir a una subrepresentació o sobrerepresentació de les dimensions i els dissenys identificats.
+The bibliometric study is based on the automatic search of words, which entails certain intrinsic limitations that must be taken into account in interpretation. This includes lack of context, language evolution, synonyms, and linguistic variations that may use different words or phrases to describe similar concepts, which can lead to underrepresentation or overrepresentation of the identified dimensions and designs.
 
 
 
@@ -504,26 +470,6 @@ dt_temp<-dt_temp %>%
                                TRUE ~ NA_character_
                                ))
 
-# table(dt_temp$Design_tipo)
-# table(dt_temp$study_type)
-# 
-# 
-# descrTable(~Design + Design_tipo + study_type + Prospective + Retrospective,method = 3,  data=dt_temp)
-
-# dt_temp<-
-#   dt_temp %>% 
-#   mutate(study_type=if_else(is.na(study_type) & Experimental==1, "Experimental",study_type)) %>% 
-#   mutate(study_type=if_else(is.na(study_type) & Observational==1, "Observational",study_type))
-
-
-# 
-# dades<- dades %>% mutate(Design_tipo = 
-#            case_when(study_type=="Experimental" ~ "Clinical trial",
-#            TRUE ~ study_type))
-# 
-# descrTable(~Design + Design_tipo + study_type + Prospective + Retrospective,method = 3,  data=dt_temp)
-# 
-# dades$Design
 
 dades<-dt_temp
 
@@ -533,8 +479,10 @@ dades<-dt_temp
 ```{r Arreglar_noms_de_variables}
 # Arreglar noms de variables
 
+source("funcions_format.R")
 
-dades<-FormatGe::netejar.noms.variables(dades)
+dades<-netejar.noms.variables(dades)
+
 
 
 ```
@@ -544,7 +492,9 @@ dades<-FormatGe::netejar.noms.variables(dades)
 ```{r recode_SINO}
 
 # Yes No 
-vars_SINO<-FormatGe::extreure.variables("SiNo",path_conductor)
+# vars_SINO<-FormatGe::extreure.variables("SiNo",path_conductor)
+vars_SINO<-extreure.variables("SiNo",path_conductor)
+
 dades<-dades %>% mutate_at(vars_SINO,~if_else(.==1,"Yes","No"))
 
 
@@ -554,7 +504,8 @@ dades<-dades %>% mutate_at(vars_SINO,~if_else(.==1,"Yes","No"))
 
 ```{r etiquetar_vars}
 
-dades<-dades %>% FormatGe::etiquetar(path_conductor)
+
+dades<-dades %>% etiquetar(path_conductor)
 
 
 ```
@@ -569,7 +520,8 @@ dades<-dades %>% FormatGe::etiquetar(path_conductor)
 
 # Problemes amb els noms dels camps per fer descriptiva
 
-formu<-FormatGe::formula_text("Baseline","",taulavariables = path_conductor)
+# formu<-FormatGe::formula_text("Baseline","",taulavariables = path_conductor)
+formu<-formula_text("Baseline","",taulavariables = path_conductor)
 
 T1<-descrTable( formu , method = 3, hide = "No", data=dades) 
 
@@ -577,14 +529,16 @@ T1 %>% export2md()
 
 
 # Problemes amb els noms dels camps per fer descriptiva
-formu<-FormatGe::formula_text("tipo","",taulavariables = path_conductor)
+# formu<-FormatGe::formula_text("tipo","",taulavariables = path_conductor)
+formu<-formula_text("tipo","",taulavariables = path_conductor)
 
 T2<-descrTable( formu , method = 3, hide = "No", data=dades, show.n = F) 
 
 T2 %>% export2md()
 
 
-formu<-FormatGe::formula_text("dimensio","",taulavariables = path_conductor)
+# formu<-FormatGe::formula_text("dimensio","",taulavariables = path_conductor)
+formu<-formula_text("dimensio","",taulavariables = path_conductor)
 
 T3 <- descrTable( formu , method = 3, hide = "No", data=dades, show.n = F) 
 
@@ -702,42 +656,8 @@ officer::read_docx(path_docs) %>%
 
 
 
-```{r generaggplowchart1, eval=FALSE}
-# abstract_sense_disseny<-dt_pp %>% filter(disseny==0) 
-# abstract_amb_disseny<-dt_pp %>% filter(disseny==1) 
 
-## Flow-chart 
-
-ggflowchart::Flow_chart_Consort(dt_temp, exclusions = c("Design=='0'"))
-
-dt_temp<-dades %>% filter(Design=="Yes")
-
-```
-
-
-
-<!-- - `r paste0("n=", length(dades[,1]) )` -->
-
-```{r desc_ii, eval=FALSE}
-
-## Descriptiva II
-
-descrTable(formu, data=dt_temp, hide = "No", include.miss = T) %>% export2md()
-
-
-
-
-```
-
-
-```{r eliminable}
-
-# dt_temp<-dades_extra %>% filter(OBJECTE=="ABSTRACT") %>% select(PMID,text=VALOR) %>% head()
-
-
-```
-
-## Descriptiva de Journal per àmbit
+## Journal Description by Domain
 
 ```{r descript_journal}
 
@@ -1122,14 +1042,15 @@ webshot::webshot("wordcloud.html", file=here::here("outputs","wordcloud.png"), d
 
 knitr::write_bib(file = 'references.bib')
 
+
 ```
 
 
 ```
 &nbsp;
 <hr />
-<p style="text-align: center;">A work by $Jordi Real$ </a></p>
-<p style="text-align: center;">$Ll-li System$ </a></p>
-<p style="text-align: center;"><span style="color: #808080;"><em><https://github.com/USR-DAPCAT/></em></span></p>
+<p style="text-align: center;">A work by Jordi Real </a></p>
+<p style="text-align: center;">CVCSD</a></p>
+<p style="text-align: center;"><span style="color: #808080;"><em><https://github.com/CVCSD></em></span></p>
 
 
