@@ -14,12 +14,10 @@
    - `webshot2`
    - `htmlwidgets`
    - `flextable`
-   - `FormatGe`
    - `table1`
    - `maps`
    - `countrycode`
-3. Install the FormatGe package from GitHub using the following command: `devtools::install_github("USR-DAPCAT/FormatGe")`
-4. Execute `render.R` script from RStudio 
+3. Execute `render.R` script from RStudio 
 
 ## File descriptions
 
