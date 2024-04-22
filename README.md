@@ -12,11 +12,15 @@
    - `wordcloud2`
    - `stringi`
    - `webshot2`
+   - `webshot`
    - `htmlwidgets`
    - `flextable`
    - `table1`
    - `maps`
    - `countrycode`
+   - `bibtex`
+   - `officer`
+
 3. Execute `render.R` script from RStudio 
 
 ## File descriptions

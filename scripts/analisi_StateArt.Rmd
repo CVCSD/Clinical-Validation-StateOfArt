@@ -107,6 +107,9 @@ library("htmlwidgets")
 library("bibtex")
 library("officer")
 library("flextable")
+library("table1")
+library("maps")
+library("countrycode")
 
 # 
 # path_conductor<-here::here("conductor_variables.xls")
@@ -625,7 +628,7 @@ plot_barres<-function(pregunta="dimensio",dt=dades,var_tabac="study_type") {
 ```
 
 
-```{r export_word, eval=TRUE}
+```{r export_word, eval=TRUE, include=FALSE}
 
 # Afegir taula, previament salvada
 # Generar taula , salvar-la en word 
@@ -641,7 +644,6 @@ officer::read_docx(path_docs) %>%
   print(path_docs)
 
 
-library(FormatGe)
 gg_pp<-plot_barres(pregunta="dimensio",dt=dades,var_tabac="study_type")
 
 
@@ -650,6 +652,11 @@ officer::read_docx(path_docs) %>%
   officer::body_add_gg(gg_pp) %>% 
   print(path_docs)
 
+# clean files 
+
+files_clean<-c("temp1.docx","temp2.docx","temp3.docx","temp1.Rmd","temp2.Rmd","temp3.Rmd")
+
+file.remove(files_clean)
 
   
 ```
@@ -688,7 +695,7 @@ T3
 
 ```{r export_t3, eval=TRUE}
 
-library(table1)
+
 # Converteixo a flextable
 T3 <- table1::t1flex(T3, tablefn = c("qflextable", "flextable", "regulartable")) 
 
@@ -899,8 +906,6 @@ officer::read_docx(path_docs) %>%
 
 
 ```{r generar_dades_mapa}
-library(maps)
-library(countrycode)
 
 # Cargar el mapa mundial
 mapa_mon <- map_data("world")
