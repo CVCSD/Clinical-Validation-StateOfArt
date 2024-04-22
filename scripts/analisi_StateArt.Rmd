@@ -22,7 +22,8 @@ bibliography: references.bib
      <!-- $head.prepend('<img src=\"https://avatars2.githubusercontent.com/u/57066591?s=200&v=4\" style=\"margin-left:25% ;width: 80px;\"/>') -->
      <!-- $head.prepend('<img src=\"codi/logos_css/logo_sant_pau.png\" style=\"float: left:1;width: 185px;\"/>') -->
      <!-- $head.prepend('<img src=\"codi/logos_css/logo_santpau.png\" style=\"float: left:1;width: 185px;\"/>') -->
-     $head.prepend('<img src=\"../codi/logos_css/logo_santpau.png\" style=\"float: left:1;width: 185px;\"/>')
+     <!-- $head.prepend('<img src=\"../codi/logos_css/logo_santpau.png\" style=\"float: left:1;width: 185px;\"/>') -->
+     $head.prepend('<img src=\"https://www.santpau.cat/o/HOSSPAU-Public-theme/images/CampusAssistencial-Convicencia-Positiu-Logo.svg\" style=\"float: left:1;width: 285px;\"/>')
 
    });
 </script>
