@@ -5,17 +5,18 @@
 1. Clone this repository in the Rstudio.
 2. Install the requeried R packages (R version >4.2):
    - `rmarkdown`
-   - `dplyr`
+   - `tidyverse`
+   - `rlang`
    - `lubridate`
+   - `Hmisc`
    - `compareGroups`
-   - `ggplot2`
+   - `flextable`
+   - `table1`
    - `wordcloud2`
    - `stringi`
    - `webshot2`
    - `webshot`
    - `htmlwidgets`
-   - `flextable`
-   - `table1`
    - `maps`
    - `countrycode`
    - `bibtex`
