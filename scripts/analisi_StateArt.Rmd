@@ -54,35 +54,6 @@ To review the state of the art of clinical validation of digital solutions in th
 - Bibliometric analysis (Visual and descriptive)
 
 
-# Method
-
-Based on the articles found in the initial search (without filtering by publication year; n=1250 papers), a bibliometric study was conducted. A dataset was created compiling information for each article: publication year, journal, country of the journal, abstract, keywords, impact factor, quartiles, and categories. A descriptive analysis of the frequencies of the generated variables, graphical analysis, Wordcloud of keywords and Mesh terms, and an analysis of frequencies according to the region and country of the first author of the article were performed. Variables related to the type of design used and domains were generated through searches of words in the title, abstract, and keywords. The list of synonymous words used according to design and domain can be seen in Tables and Annex. Additionally, the scope of application and the journal quartile were captured.
-
-A bivariate descriptive table of terms related to the domain in relation to the study design (Observational / Experimental) was performed. Data management and analysis were performed using @R-base, bivariate tables were generated using the package @R-compareGroups, @compareGroups2014, and graphical analysis was performed using R packages @R-ggplot2, @R-wordcloud2, and @R-maps.
-
-
-
-
-```{r citacions, include=FALSE, message=FALSE}
-
-
-# citation("compareGroups")
-# citation("base")
-# 
-# knitr::write_bib(c("compareGroups","base", "ggplot2","wordcloud2", "maps"),file="references.bib")
-# 
-
-# 
-# install.packages("bibtex")
-# 
-# refs<-read.bib("references.bib")
-# 
-# keys <- names(refs)
-# 
-# keys
-# ?ggplot2
-
-```
 
 
 ```{r setup, include = FALSE}
@@ -122,9 +93,9 @@ library("countrycode")
 ```{r lectura_articles_pubmed}
 
 
-dades<-read.csv2(here::here("data","papers.txt"), sep="#") %>% mutate(PMID=as.character(PMID))
+dades<-read.csv2(here::here("data","papers.txt"), sep="|") %>% mutate(PMID=as.character(PMID))
 
-dades_extra<-read.csv2(here::here("data","objects.txt"), sep="#",encoding = "UTF-8")
+dades_extra<-read.csv2(here::here("data","objects.txt"), sep="|",encoding = "UTF-8") %>% mutate(PMID=as.character(PMID))
 
 
 dt_cataleg_countries<-read.csv2(here::here("data","Countries.txt"), sep=",",encoding = "UTF-8")
@@ -142,6 +113,44 @@ path_docs<-here::here("outputs","taules.docx")
 ```
 
 
+# Method
+
+```{r contatges}
+
+n_count=count(dades) %>% as.numeric()
+
+
+```
+
+
+
+Based on the articles found in the initial search (without filtering by publication year; n=`r n_count` papers), a bibliometric study was conducted. A dataset was created compiling information for each article: publication year, journal, country of the journal, abstract, keywords, impact factor, quartiles, and categories. A descriptive analysis of the frequencies of the generated variables, graphical analysis, Wordcloud of keywords and Mesh terms, and an analysis of frequencies according to the region and country of the first author of the article were performed. Variables related to the type of design used and domains were generated through searches of words in the title, abstract, and keywords. The list of synonymous words used according to design and domain can be seen in Tables and Annex. Additionally, the scope of application and the journal quartile were captured.
+
+A bivariate descriptive table of terms related to the domain in relation to the study design (Observational / Experimental) was performed. Data management and analysis were performed using @R-base, bivariate tables were generated using the package @R-compareGroups, @compareGroups2014, and graphical analysis was performed using R packages @R-ggplot2, @R-wordcloud2, and @R-maps.
+
+
+
+
+```{r citacions, include=FALSE, message=FALSE}
+
+
+# citation("compareGroups")
+# citation("base")
+# 
+# knitr::write_bib(c("compareGroups","base", "ggplot2","wordcloud2", "maps"),file="references.bib")
+# 
+
+# 
+# install.packages("bibtex")
+# 
+# refs<-read.bib("references.bib")
+# 
+# keys <- names(refs)
+# 
+# keys
+# ?ggplot2
+
+```
 
 
 ```{r capturar_tipus}
@@ -289,16 +298,21 @@ officer::read_docx(path_docs) %>%                 # creating a null .docx object
 # Results
 
 
+```{r results_comentats}
 
-The search provided a total of 1250 papers. In the Wordcloud, it can be observed that the most frequent keywords refer to mobile health, eHealth, and validation. Out of the total 1250 papers, epidemiological designs were identified in 449 of them, of which 40% were classified as clinical trials, while the rest were observational studies or systematic reviews. Among the works where the epidemiological design was identified, 55.3% were observational.
 
-Of all the references found, the most frequent dimension was Usability (n=222, 17.8%), followed by Security (14.2%), and Feasibility (10.0%).
+```
+
+
+The search provided a total of `r n_count` papers. In the Wordcloud, it can be observed that the most frequent keywords refer to mobile health, eHealth, and validation. Out of the total `r n_count` papers, epidemiological designs were identified in 528 of them, of which 41.3% were classified as clinical trials, while the rest were observational studies or systematic reviews. Among the works where the epidemiological design was identified, 54% were observational.
+
+Of all the references found, the most frequent dimension was Usability (n=261, 18.4%), followed by Security (13.8%), and Feasibility (10.6%).
 
 Table and figure shows the frequency of papers found per dimensions depending on whether the studies could be classified as observational or experimental. Significant differences (p<0.05) are observed in the dimensions of Feasibility (Proof of concept), and Effectiveness, with greater representation in experimental studies compared to observational studies. The rest of the dimensions show similar frequencies, except for the dimension of Efficacy, where there is also more representation in experimental studies (10.6% versus 5.8%).
 
 Regarding the scope of application where they are published, 21.5% of the articles were found in Health care sciences, and 19% in journals related to medical informatics. The frequency of papers has exponentially increased, being more frequent in journals classified in quartiles 1 or 2.
 
-The authors who publish the most are mainly from the United States (25%), followed by European countries such as the UK (7.53%), Spain, Germany, and Australia (7.53%).
+The authors who publish the most are mainly from the United States (24.2%), followed by European countries such as the UK (8.07%), Spain, Germany, and Australia.
 
 
 ## Limitations on Interpretation
@@ -338,14 +352,14 @@ webshot::webshot("wordcloud.html", file="wordcloud.png", delay = 5, vwidth = 100
 
 ```
 
-![Wordcloud Keywords](wordcloud.png){width=400% height=400% }
+![](wordcloud.png){width=400% height=400% }
 
 
 
 
-## Wordcloud termes Mesh
+## Wordcloud Mesh Terms
 
-```{r Wordcloud2, include=TRUE}
+```{r Wordcloud2, include=FALSE}
 
 paraula<-"MESH"
 
@@ -358,7 +372,7 @@ freq_keyword$word<-freq_keyword$word %>% iconv(to = "UTF-8", sub = "")
 
 
 set.seed(124)
-world_cloud_mesh<-wordcloud2(freq_keyword,size = 2)
+world_cloud_mesh<-wordcloud2(freq_keyword,size = 2,shuffle =F)
 
 saveWidget(world_cloud_mesh, "tmp2.html", selfcontained = F)
 webshot("tmp2.html", "wc2.png", delay = 5, vwidth = 1000, vheight = 1000)
@@ -371,7 +385,7 @@ webshot("tmp2.html", "wc2.png", delay = 5, vwidth = 1000, vheight = 1000)
 ```
 
 
-![wordcloud Mesh terms](wc2.png){width=400% height=400% }
+![](wc2.png){width=400% height=400% }
 
 
 
@@ -514,7 +528,7 @@ dades<-dades %>% etiquetar(path_conductor)
 
 ```
 
-## Descriptiva I
+## Descriptive tables
 
 - `r paste0("Global; n=", length(dades[,1]))`
 
@@ -525,7 +539,7 @@ dades<-dades %>% etiquetar(path_conductor)
 # Problemes amb els noms dels camps per fer descriptiva
 
 # formu<-FormatGe::formula_text("Baseline","",taulavariables = path_conductor)
-formu<-formula_text("Baseline","",taulavariables = path_conductor)
+formu<-FormatGe::formula_text("Baseline","",taulavariables = path_conductor)
 
 T1<-descrTable( formu , method = 3, hide = "No", data=dades) 
 
@@ -553,8 +567,10 @@ T3 %>% export2md()
 # descrTable( formu , method = 3, hide = "No", data=dades, show.n = T, byrow = F) %>% export2md()
 
 
-# formu<-FormatGe::formula_text("dimensio","study_type",taulavariables = path_conductor)
-# descrTable( formu , method = 3, data=dades, show.n = T, byrow = F, hide = "No") %>% export2md()
+formu<-FormatGe::formula_text("dimensio","study_type",taulavariables = path_conductor)
+T4 <- descrTable( formu , method = 3, data=dades, show.n = T, byrow = F, hide = "No") 
+
+T4 %>% export2md()
 # 
 
 ```
@@ -636,12 +652,14 @@ plot_barres<-function(pregunta="dimensio",dt=dades,var_tabac="study_type") {
 T1 %>% export2word("temp1.docx") 
 T2 %>% export2word("temp2.docx") 
 T3 %>% export2word("temp3.docx") 
+T4 %>% export2word("temp4.docx") 
 
 # Afegir taules en un word
 officer::read_docx(path_docs) %>% 
   officer::body_add_docx("temp1.docx") %>% 
   officer::body_add_docx("temp2.docx") %>% 
   officer::body_add_docx("temp3.docx") %>% 
+  officer::body_add_docx("temp4.docx") %>% 
   print(path_docs)
 
 
@@ -655,7 +673,7 @@ officer::read_docx(path_docs) %>%
 
 # clean files 
 
-files_clean<-c("temp1.docx","temp2.docx","temp3.docx","temp1.Rmd","temp2.Rmd","temp3.Rmd")
+files_clean<-c("temp1.docx","temp2.docx","temp3.docx","temp4.docx","temp1.Rmd","temp2.Rmd","temp3.Rmd","temp4.Rmd", "temp2.html")
 
 file.remove(files_clean)
 
@@ -741,10 +759,10 @@ officer::read_docx(path_docs) %>%
 ```
 
 
-## Evolució de frequencia de papers
+## Evolution of the frequency of published papers 
 
-- Segons Quartil
-- Segons ámbit de revista
+- According to quartile journal
+- According to scope of the journal
 
 ```{r evolucio_freq_papers}
 # VAriable tipus 
@@ -854,7 +872,7 @@ officer::read_docx(path_docs) %>%
 ```
 
 
-## Papers per paisos i regions
+## Frequency papers by country and region
 
 ```{r papers_regions, eval=T, include=TRUE}
 
@@ -1023,7 +1041,7 @@ officer::read_docx(path_docs) %>%
 ```
 
 
-```{r salvar_figures}
+```{r salvar_figures, include=FALSE}
 
 
 ggsave(here::here("outputs","fig2B.png"), fig3)
@@ -1035,7 +1053,9 @@ ggsave(here::here("outputs","fig3A.png"),gg_map2)
 ggsave(here::here("outputs","fig3A_regions.png"),gg_map1)
 
 htmlwidgets::saveWidget(world_cloud_keywords, "wordcloud.html", selfcontained = F)
+
 webshot::webshot("wordcloud.html", file=here::here("outputs","wordcloud.png"), delay = 5, vwidth = 1000, vheight = 1000)
+
 
 
 ```
@@ -1044,7 +1064,7 @@ webshot::webshot("wordcloud.html", file=here::here("outputs","wordcloud.png"), d
 # References
 
 
-```{r references, include=TRUE}
+```{r references, include=FALSE}
 
 knitr::write_bib(file = 'references.bib')
 
