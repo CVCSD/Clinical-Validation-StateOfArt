@@ -82,6 +82,7 @@ library("flextable")
 library("table1")
 library("maps")
 library("countrycode")
+# library("tiff")
 
 # 
 # path_conductor<-here::here("conductor_variables.xls")
@@ -346,14 +347,22 @@ world_cloud_keywords<-wordcloud2(freq_keyword,size = 2,shuffle =F)
 # wordcloud2(freq_keyword,size = 2,shuffle =F,color=rep_len( c("green","blue","orange","red"), nrow(freq_keyword)))
 
 htmlwidgets::saveWidget(world_cloud_keywords, "wordcloud.html", selfcontained = F)
-webshot::webshot("wordcloud.html", file="wordcloud.png", delay = 5, vwidth = 1000, vheight = 1000)
+webshot::webshot("wordcloud.html", file="../outputs/wordcloud.png", delay = 5, vwidth = 1000, vheight = 1000)
 
 # {width=100%, height=100% }
 
+
+
 ```
 
-![](wordcloud.png){width=400% height=400% }
+![](../outputs/wordcloud.png){width=400% height=400% }
 
+```{r save_wordcloud}
+
+
+
+
+```
 
 
 
@@ -371,12 +380,13 @@ freq_keyword<-
 freq_keyword$word<-freq_keyword$word %>% iconv(to = "UTF-8", sub = "")
 
 
-set.seed(124)
+set.seed(123)
 world_cloud_mesh<-wordcloud2(freq_keyword,size = 2,shuffle =F)
 
 saveWidget(world_cloud_mesh, "tmp2.html", selfcontained = F)
-webshot("tmp2.html", "wc2.png", delay = 5, vwidth = 1000, vheight = 1000)
+webshot("tmp2.html", "../outputs/wc2.png", delay = 5, vwidth = 1000, vheight = 1000)
 
+# "../outputs/wc2.png"
 
 # and in png or pdf
 # webshot("tmp.html","fig_1.pdf", delay =5, vwidth = 480, vheight=480)
@@ -385,7 +395,7 @@ webshot("tmp2.html", "wc2.png", delay = 5, vwidth = 1000, vheight = 1000)
 ```
 
 
-![](wc2.png){width=400% height=400% }
+![](../outputs/wc2.png){width=400% height=400% }
 
 
 
@@ -393,12 +403,12 @@ webshot("tmp2.html", "wc2.png", delay = 5, vwidth = 1000, vheight = 1000)
 ```{r salvar_en_docs, eval=TRUE}
 
 officer::read_docx(path_docs) %>% 
-  officer::body_add_img("wordcloud.png",height = 5, width = 5) %>% 
+  officer::body_add_img("../outputs/wordcloud.png",height = 5, width = 5) %>% 
   print(target = path_docs)  
 
 
 officer::read_docx(path_docs) %>% 
-  officer::body_add_img("wc2.png",height = 5, width = 5) %>% 
+  officer::body_add_img("../outputs/wc2.png",height = 5, width = 5) %>% 
   print(target = path_docs)  
 
 ```
@@ -782,7 +792,7 @@ dt_temp3<-dt_temp %>% group_by(PUBYEAR) %>% count() %>% na.omit() %>% ungroup() 
 dt_temp2<-dt_temp %>% group_by(PUBYEAR,Quartil) %>% count() %>% na.omit() %>% ungroup() %>% filter(Quartil!="N/A") 
 
 dt_temp2<-dt_temp2 %>% bind_rows(dt_temp3) %>% arrange(PUBYEAR,Quartil) %>% 
-  filter(PUBYEAR<2023 & PUBYEAR>2005)
+  filter(PUBYEAR<2024 & PUBYEAR>2005)
 
 
 # dt_temp2
@@ -791,8 +801,7 @@ dt_temp2<-dt_temp2 %>% bind_rows(dt_temp3) %>% arrange(PUBYEAR,Quartil) %>%
 fig4<-ggplot(dt_temp2, aes(x = PUBYEAR, y = n, group = Quartil, color = Quartil)) +
   # geom_line(size=1) +
   geom_smooth(method = "loess", se = FALSE) +
-  labs(title = "Evolution of the papers indexed in PubMed by Quartile",
-       x = "Year of publication",
+  labs(x = "Year of publication",
        y = "Frequency",
        color = "Quartile") + ggplot2::theme_light() +
   
@@ -830,15 +839,14 @@ dt_temp<-dt_temp %>% select(PMID,TIPUS, Quartil=QUARTIL,PUBYEAR,Journal)
 
 # Agregació per any
 dt_temp2<-dt_temp %>% group_by(PUBYEAR,Journal) %>% count() %>% na.omit() %>% ungroup() %>% filter(Journal!="N/A") %>% 
-  filter(PUBYEAR<2023 & PUBYEAR>2005)
+  filter(PUBYEAR<2024 & PUBYEAR>2005)
 
 # Gg-plot 
 fig5<-
   ggplot(dt_temp2, aes(x = PUBYEAR, y = n, group = Journal, color = Journal)) +
   # geom_line(size=1) +
   geom_smooth(method = "loess", se = FALSE) +
-  labs(title = "Evolution of the frequency papers indexed in PubMed by scope",
-       x = "Year of publication",
+  labs(x = "Year of publication",
        y = "Frequency",
        color = "") +
   
@@ -973,7 +981,7 @@ gg_map1<-
   geom_polygon() +
   coord_fixed(ratio = 1.6) + # Relación de aspecto para proyectar el mapa correctamente
   scale_fill_gradient(low = "orange1", high = "orange4") +
-  labs(title = "Frequency Map of Papers by regions",
+  labs(title = "",
        fill = "Frequency",
        caption = "Grey colour: No data",
        x = "", y = "") +
@@ -1045,17 +1053,31 @@ officer::read_docx(path_docs) %>%
 
 
 ggsave(here::here("outputs","fig2B.png"), fig3)
+ggsave(here::here("outputs","fig2B.tiff"), fig3,dpi = 300,limitsize = 1000)
 
 ggsave(here::here("outputs","fig2A.png"), fig4)
+ggsave(here::here("outputs","fig2A.tiff"), fig4, dpi = 300,limitsize = 1000)
 
 ggsave(here::here("outputs","fig3A.png"),gg_map2)
+ggsave(here::here("outputs","fig3A.tiff"),gg_map2, dpi = 300,limitsize = 1000)
 
 ggsave(here::here("outputs","fig3A_regions.png"),gg_map1)
+ggsave(here::here("outputs","fig3A_regions.tiff"),gg_map1,dpi = 300,limitsize = 1000)
 
 htmlwidgets::saveWidget(world_cloud_keywords, "wordcloud.html", selfcontained = F)
-
 webshot::webshot("wordcloud.html", file=here::here("outputs","wordcloud.png"), delay = 5, vwidth = 1000, vheight = 1000)
 
+# Leer arxivos i guardar en Tiff 
+mi_captura <- png::readPNG(here::here("outputs","wordcloud.png"))
+tiff::writeTIFF(mi_captura, here::here("outputs","wordcloud.tiff"))
+
+
+
+# htmlwidgets::saveWidget(world_cloud_keywords, "wordcloud.html", selfcontained = F)
+# webshot::webshot("wordcloud.html", file=here::here("outputs","wordcloud.tiff"), delay = 5, vwidth = 1000, vheight = 1000)
+# 
+# htmlwidgets::saveWidget(world_cloud_keywords, "wordcloud.html", selfcontained = F)
+# webshot::webshot("wordcloud.html", file=here::here("outputs","wordcloud.ps"), delay = 5, vwidth = 1000, vheight = 1000)
 
 
 ```
