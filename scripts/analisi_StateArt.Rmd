@@ -1011,6 +1011,8 @@ dades %>% group_by(Author_country) %>% count() %>% ungroup() %>% arrange(desc(n)
 
 # Mapa per pais
 
+# title = "Frequency Map of Papers by Countries Worldwide"
+
 # Capturar frequencies d'articles
 # Agregació per subregions
 freqs_pais<-dades %>% group_by(id_pais) %>% count() %>% ungroup()
@@ -1022,8 +1024,7 @@ gg_map2<-
   geom_polygon() +
   coord_fixed(ratio = 1.6) + # Relación de aspecto para proyectar el mapa correctamente
   scale_fill_gradient(low = "orange", high = "orange4") +
-  labs(title = "Frequency Map of Papers by Countries Worldwide",
-       fill = "Frequency",
+  labs(fill = "Frequency",
        x = "", y = "", caption = "Grey colour: No data") +
   theme_minimal()
 
